@@ -7,6 +7,8 @@ import (
 	"strings"
 	"sync/atomic"
 	"time"
+
+	"github.com/aws/aws-xray-sdk-go/xray"
 )
 
 // DB is a logical database with multiple underlying physical databases
@@ -25,7 +27,10 @@ func Open(driverName, dataSourceNames string) (*DB, error) {
 	db := &DB{pdbs: make([]*sql.DB, len(conns))}
 
 	err := scatter(len(db.pdbs), func(i int) (err error) {
-		db.pdbs[i], err = sql.Open(driverName, conns[i])
+		db.pdbs[i], err = xray.SQLContext(driverName, conns[i])
+		// db.pdbs[i].SetMaxOpenConns(10)
+		// db.pdbs[i].SetMaxIdleConns(10)
+		// db.pdbs[i].SetConnMaxLifetime(5 * time.Minute)
 		return err
 	})
 
