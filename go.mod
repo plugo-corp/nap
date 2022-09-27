@@ -1,4 +1,4 @@
-module github.com/codebrick-corp/nap
+module github.com/plugo-corp/nap
 
 go 1.12
 
